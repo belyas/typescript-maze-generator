@@ -4,8 +4,9 @@
         return;
     }
 
-    const canvas = document.getElementById("pp-maze");
-    const ctx = canvas.getContext("2d");
+    const regenerateMaze = document.getElementById('regenerateMaze');
+    const canvas = document.getElementById('pp-maze');
+    const ctx = canvas.getContext('2d');
     const MAZE_SIZE_LEN = 30;
     const WIDTH = 500;
     const HEIGHT = 500;
@@ -157,12 +158,17 @@
         }
     }
 
-    const configs = {
-        width: WIDTH,
-        height: HEIGHT,
-        mazeLength: MAZE_SIZE_LEN
+    const renderMaze = () => {
+        const configs = {
+            width: WIDTH,
+            height: HEIGHT,
+            mazeLength: MAZE_SIZE_LEN
+        };
+        const PpMaze = new Maze(configs);
+        PpMaze.render();
     };
-    const PpMaze = new Maze(configs);
 
-    PpMaze.render();
+    renderMaze();
+
+    regenerateMaze.addEventListener('click', renderMaze);
 })(window.Cell);
