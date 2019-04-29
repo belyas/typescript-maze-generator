@@ -18,21 +18,21 @@
 
         prepareData() {
             for (let r = 0; r < this._mzLen; r++) { // rows
-                this.data.push([]); // init data per row
+                this.data[r] = []; // init data per row
 
                 for (let c = 0; c < this._mzLen; c++) { // cols
+                    let cell;
                     // add wall edges (top|left|bottom|right)
                     if ((r === 0 || r === (this._mzLen - 1))
                         || (c === 0 || c === (this._mzLen - 1))) {
-                        let cell = new Cell('edge');
-                        cell.setPosition(r, c);
-                        this.data[r].push(cell);
+                        cell = new Cell('edge');
                     } else {
                         // add routes
-                        let cell = new Cell('e');
-                        cell.setPosition(r, c);
-                        this.data[r].push(cell);
+                        cell = new Cell('e');
                     }
+                    
+                    cell.setPosition(r, c);
+                    this.data[r][c] = cell;
                 }
             }
         }
