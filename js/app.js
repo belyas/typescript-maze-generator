@@ -122,7 +122,7 @@
             let numRows = this.data.length;
     
             if (!numRows) {
-                return; // No data has been genereated
+                return; // No data has been generated
             }
     
             let numCols    = this.data[0].length;
