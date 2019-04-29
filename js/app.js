@@ -1,4 +1,9 @@
 (function (Cell) {
+    if (typeof Cell === "undefined") {
+        alert('Cell class is missing');
+        return;
+    }
+
     const canvas = document.getElementById("pp-maze");
     const ctx = canvas.getContext("2d");
     const MAZE_SIZE_LEN = 30;
@@ -30,7 +35,7 @@
                         // add routes
                         cell = new Cell('e');
                     }
-                    
+
                     cell.setPosition(r, c);
                     this.data[r][c] = cell;
                 }
