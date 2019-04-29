@@ -1,0 +1,30 @@
+{
+  "name": "javascript-maze-generator",
+  "version": "1.0.0",
+  "description": "Javascript maze generator",
+  "main": "js/app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/belyas/javascript-maze-generator.git"
+  },
+  "keywords": [
+    "javascript",
+    "js",
+    "maze",
+    "maze-generator",
+    "algo",
+    "algorithm",
+    "data-structure"
+  ],
+  "author": "Yassine belkaid",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/belyas/javascript-maze-generator/issues"
+  },
+  "homepage": "https://github.com/belyas/javascript-maze-generator#readme",
+  "devDependencies": {},
+  "dependencies": {}
+}
