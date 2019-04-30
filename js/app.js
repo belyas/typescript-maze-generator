@@ -1,5 +1,5 @@
 (function (Cell) {
-    if (typeof Cell === "undefined") {
+    if (Cell === null) {
         alert('Cell class is missing');
         return;
     }
@@ -171,4 +171,4 @@
     renderMaze();
 
     regenerateMaze.addEventListener('click', renderMaze);
-})(window.Cell);
+})(typeof window.Cell === "undefined" ? null : window.Cell);
