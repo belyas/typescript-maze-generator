@@ -16,18 +16,5 @@
             this.row = row;
             this.col = col;
         }
-
-        getNeighbors () {
-            return [
-                [this.row - 1,this.col - 1],
-                [this.row - 1,this.col] ,
-                [this.row - 1,this.col + 1],
-                [this.row, this.col - 1],
-                [this.row, this.col + 1],
-                [this.row + 1,this.col - 1],
-                [this.row + 1,this.col] ,
-                [this.row + 1,this.col + 1]
-            ];
-        }
     }
 })(window);
