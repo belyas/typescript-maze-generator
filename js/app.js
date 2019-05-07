@@ -14,7 +14,7 @@
     canvas.height = HEIGHT;
 
     class Maze {
-        constructor({ width = 500, height = 500, mazeLength = 20 }) {
+        constructor ({ width = 500, height = 500, mazeLength = 20 }) {
             this.data = [];
             this._width = width;
             this._height = height;
@@ -22,15 +22,15 @@
             this._innerBisection = 3;
         }
 
-        prepareData() {
+        prepareData () {
             for (let r = 0; r < this._mzLen; r++) { // rows
                 this.data[r] = []; // init data per row
 
                 for (let c = 0; c < this._mzLen; c++) { // cols
                     let cell;
                     // add wall edges (top|left|bottom|right)
-                    if ((r === 0 || r === (this._mzLen - 1))
-                        || (c === 0 || c === (this._mzLen - 1))) {
+                    if ((r === 0 || r === (this._mzLen - 1)) ||
+                        (c === 0 || c === (this._mzLen - 1))) {
                         cell = new Cell('edge');
                     } else {
                         // add routes
@@ -43,7 +43,7 @@
             }
         }
 
-        carveRecursive(x1, x2, y1, y2) { // Divide & Conquer
+        carveRecursive (x1, x2, y1, y2) { // Divide & Conquer
             let _width = x2 - x1;
             let _height = y2 - y1;
 
@@ -58,8 +58,8 @@
                     let { min, max, bisection, rand } = this.calcBisectionMinMax(x1, x2, y2, y1, 'vert');
 
                     for (let i = y1 + 1; i < y2; i++) {
-                        if (this.data[y2][bisection].value === "e"
-                            && this.data[y1][bisection].value === "e") {
+                        if (this.data[y2][bisection].value === 'e' &&
+                            this.data[y1][bisection].value === 'e') {
                             if (i === max || i === min) {
                                 continue;
                             }
@@ -67,7 +67,7 @@
                             continue;
                         }
 
-                        this.data[i][bisection].value = "w";
+                        this.data[i][bisection].value = 'w';
                     }
 
                     this.carveRecursive(x1, bisection, y1, y2);
@@ -79,8 +79,8 @@
                     let { min, max, bisection, rand } = this.calcBisectionMinMax(y1, y2, x2, x1);
 
                     for (let i = x1 + 1; i < x2; i++) {
-                        if (this.data[bisection][x2].value === "e"
-                            && this.data[bisection][x1].value === "e") {
+                        if (this.data[bisection][x2].value === 'e' &&
+                            this.data[bisection][x1].value === 'e') {
                             if (i === max || i === min) {
                                 continue;
                             }
@@ -88,7 +88,7 @@
                             continue;
                         }
 
-                        this.data[bisection][i].value = "w";
+                        this.data[bisection][i].value = 'w';
                     }
 
                     this.carveRecursive(x1, x2, y1, bisection);
@@ -97,7 +97,7 @@
             }
         }
 
-        render() {
+        render () {
             // generate data
             this.carveRecursive(0, this._mzLen - 1, 0, this._mzLen - 1);
 
@@ -115,27 +115,27 @@
             let cellLength = cellWidth > cellHeight ? cellHeight : cellWidth;
 
             // define start spot
-            this.start_point.value = 's';
+            this.startPoint.value = 's';
 
             // define end spot
-            this.end_point.value = 'f';
+            this.endPoint.value = 'f';
 
             for (let row = 0; row < numRows; row++) {
                 for (let col = 0; col < numCols; col++) {
                     let rectX = col * cellLength;
                     let rectY = row * cellLength;
-                    
+
                     ctx.fillStyle = this.data[row][col].getColor();
                     ctx.fillRect(rectX, rectY, cellLength, cellLength);
                 }
             }
         }
 
-        get start_point () {
+        get startPoint () {
             return this.data[1][1];
         }
 
-        get end_point () {
+        get endPoint () {
             return this.data[this.data.length - 2][this.data.length - 2];
         }
 
@@ -146,19 +146,19 @@
             let random = Math.floor(Math.random() * (max - min + 1)) + min;
 
             if (mode === 'hor') {
-                if (this.data[bisection][c].value === "e") {
-                    random = max;
-                }
-                
-                if (this.data[bisection][d].value === "e") {
-                    random = min;
-                }
-            } else {
-                if (this.data[c][bisection].value === "e") {
+                if (this.data[bisection][c].value === 'e') {
                     random = max;
                 }
 
-                if (this.data[d][bisection].value === "e") {
+                if (this.data[bisection][d].value === 'e') {
+                    random = min;
+                }
+            } else {
+                if (this.data[c][bisection].value === 'e') {
+                    random = max;
+                }
+
+                if (this.data[d][bisection].value === 'e') {
                     random = min;
                 }
             }
@@ -185,4 +185,4 @@
     renderMaze();
 
     regenerateMaze.addEventListener('click', renderMaze);
-})(typeof window.Cell === "undefined" ? null : window.Cell);
+})(typeof window.Cell === 'undefined' ? null : window.Cell);
