@@ -1,6 +1,6 @@
 interface Position {
-    row: number;
-    col: number;
+    readonly row: number;
+    readonly col: number;
 }
 
 class Cell {
