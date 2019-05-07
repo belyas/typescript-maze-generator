@@ -4,11 +4,11 @@ interface Position {
 }
 
 class Cell {
-    /** @var holds cell's value to be colored */
+    /** @var string holds cell's value to be colored */
     value: string;
-    /** @var cell's row position */
+    /** @var number|null cell's row position */
     row: number | null;
-    /** @var cell's column position */
+    /** @var number|null cell's column position */
     col: number | null;
 
     constructor(type: string) {

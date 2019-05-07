@@ -28,6 +28,11 @@ var Maze = /** @class */ (function () {
             }
         }
     };
+    /**
+     * Divide & Conquer recursively
+     *
+     * @return void
+     */
     Maze.prototype.carveRecursive = function (x1, x2, y1, y2) {
         var _width = x2 - x1;
         var _height = y2 - y1;
@@ -72,6 +77,9 @@ var Maze = /** @class */ (function () {
             }
         }
     };
+    /**
+     * Create data and draw the maze
+     */
     Maze.prototype.render = function () {
         // prepare maze data
         if (this.data.length === 0) {
