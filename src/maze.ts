@@ -1,25 +1,27 @@
-(function (Cell) {
-    if (Cell === null) {
-        alert('Cell class is missing');
-        return;
-    }
+/// <reference path="cell.ts"/>
 
-    const regenerateMaze = document.getElementById('regenerateMaze');
-    const canvas = document.getElementById('pp-maze');
-    const ctx = canvas.getContext('2d');
-    const MAZE_SIZE_LEN = 30;
-    const WIDTH = 500;
-    const HEIGHT = 500;
-    canvas.width = WIDTH;
-    canvas.height = HEIGHT;
+interface MazeInterface {
+    width: number;
+    height: number;
+    mazeLength: number;
+    ctx: any;
+}
 
-    class Maze {
-        constructor ({ width = 500, height = 500, mazeLength = 20 }) {
+class Maze {
+        data: any[];
+        _width: number;
+        _height: number;
+        _mzLen: number;
+        _innerBisection: number;
+        _ctx: any;
+
+        constructor ({ width = 500, height = 500, mazeLength = 20, ctx }: MazeInterface) {
             this.data = [];
             this._width = width;
             this._height = height;
             this._mzLen = mazeLength;
             this._innerBisection = 3;
+            this._ctx = ctx;
         }
 
         prepareData () {
@@ -37,20 +39,15 @@
                         cell = new Cell('e');
                     }
 
-                    cell.setPosition({ r, c });
+                    cell.setPosition({ row: r, col: c });
                     this.data[r][c] = cell;
                 }
             }
         }
 
-        carveRecursive (x1, x2, y1, y2) { // Divide & Conquer
+        carveRecursive (x1: number, x2: number, y1: number, y2: number) { // Divide & Conquer
             let _width = x2 - x1;
             let _height = y2 - y1;
-
-            // prepare maze data
-            if (this.data.length === 0) {
-                this.prepareData();
-            }
 
             if (_width >= _height) {
                 // bisection vertically
@@ -98,10 +95,15 @@
         }
 
         render () {
+            // prepare maze data
+            if (this.data.length === 0) {
+                this.prepareData();
+            }
+
             // generate data
             this.carveRecursive(0, this._mzLen - 1, 0, this._mzLen - 1);
 
-            ctx.clearRect(0, 0, WIDTH, HEIGHT);
+            this._ctx.clearRect(0, 0, this._width, this._height);
 
             let numRows = this.data.length;
 
@@ -110,36 +112,36 @@
             }
 
             let numCols = this.data[0].length;
-            let cellWidth = WIDTH / numCols;
-            let cellHeight = HEIGHT / numRows;
+            let cellWidth = this._width / numCols;
+            let cellHeight = this._height / numRows;
             let cellLength = cellWidth > cellHeight ? cellHeight : cellWidth;
 
             // define start spot
-            this.startPoint.value = 's';
+            this.startPoint().value = 's';
 
             // define end spot
-            this.endPoint.value = 'f';
+            this.endPoint().value = 'f';
 
             for (let row = 0; row < numRows; row++) {
                 for (let col = 0; col < numCols; col++) {
                     let rectX = col * cellLength;
                     let rectY = row * cellLength;
 
-                    ctx.fillStyle = this.data[row][col].getColor();
-                    ctx.fillRect(rectX, rectY, cellLength, cellLength);
+                    this._ctx.fillStyle = this.data[row][col].getColor();
+                    this._ctx.fillRect(rectX, rectY, cellLength, cellLength);
                 }
             }
         }
 
-        get startPoint () {
+        startPoint () {
             return this.data[1][1];
         }
 
-        get endPoint () {
+        endPoint () {
             return this.data[this.data.length - 2][this.data.length - 2];
         }
 
-        calcBisectionMinMax (a, b, c, d, mode = 'hor') {
+        calcBisectionMinMax (a: number, b: number, c: number, d: number, mode: string = 'hor') {
             let bisection = Math.ceil((a + b) / 2);
             let max = c - 1;
             let min = d + 1;
@@ -170,19 +172,4 @@
                 rand: random
             };
         }
-    }
-
-    const renderMaze = () => {
-        const configs = {
-            width: WIDTH,
-            height: HEIGHT,
-            mazeLength: MAZE_SIZE_LEN
-        };
-        const PpMaze = new Maze(configs);
-        PpMaze.render();
     };
-
-    renderMaze();
-
-    regenerateMaze.addEventListener('click', renderMaze);
-})(typeof window.Cell === 'undefined' ? null : window.Cell);
