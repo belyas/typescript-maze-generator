@@ -31,9 +31,9 @@
             return color;
         }
 
-        setPosition (row, col) {
-            this.row = row;
-            this.col = col;
+        setPosition ({ r = 0, c = 0 }) {
+            this.row = r;
+            this.col = c;
         }
     };
 })(window);

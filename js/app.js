@@ -37,7 +37,7 @@
                         cell = new Cell('e');
                     }
 
-                    cell.setPosition(r, c);
+                    cell.setPosition({ r, c });
                     this.data[r][c] = cell;
                 }
             }
