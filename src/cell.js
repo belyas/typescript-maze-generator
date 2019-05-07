@@ -1,3 +1,4 @@
+"use strict";
 var Cell = /** @class */ (function () {
     function Cell(type) {
         this.value = type;

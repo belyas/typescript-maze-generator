@@ -1,3 +1,4 @@
+"use strict";
 /// <reference path="cell.ts"/>
 var Maze = /** @class */ (function () {
     function Maze(_a) {
