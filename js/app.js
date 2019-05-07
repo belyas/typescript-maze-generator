@@ -114,15 +114,29 @@
             let cellHeight = HEIGHT / numRows;
             let cellLength = cellWidth > cellHeight ? cellHeight : cellWidth;
 
+            // define start spot
+            this.start_point.value = 's';
+
+            // define end spot
+            this.end_point.value = 'f';
+
             for (let row = 0; row < numRows; row++) {
                 for (let col = 0; col < numCols; col++) {
                     let rectX = col * cellLength;
                     let rectY = row * cellLength;
+                    
                     ctx.fillStyle = this.data[row][col].getColor();
-
                     ctx.fillRect(rectX, rectY, cellLength, cellLength);
                 }
             }
+        }
+
+        get start_point () {
+            return this.data[1][1];
+        }
+
+        get end_point () {
+            return this.data[this.data.length - 2][this.data.length - 2];
         }
 
         calcBisectionMinMax (a, b, c, d, mode = 'hor') {
