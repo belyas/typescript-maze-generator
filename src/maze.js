@@ -11,18 +11,21 @@ var Maze = /** @class */ (function () {
         this._ctx = ctx;
     }
     Maze.prototype.prepareData = function () {
-        for (var r = 0; r < this._mzLen; r++) { // rows
+        for (var r = 0; r < this._mzLen; r++) {
+            // rows
             this.data[r] = []; // init data per row
-            for (var c = 0; c < this._mzLen; c++) { // cols
+            for (var c = 0; c < this._mzLen; c++) {
+                // cols
                 var cell = void 0;
                 // add wall edges (top|left|bottom|right)
-                if ((r === 0 || r === (this._mzLen - 1)) ||
-                    (c === 0 || c === (this._mzLen - 1))) {
-                    cell = new Cell('edge');
+                if (r === 0 ||
+                    r === this._mzLen - 1 ||
+                    (c === 0 || c === this._mzLen - 1)) {
+                    cell = new Cell("edge");
                 }
                 else {
                     // add routes
-                    cell = new Cell('e');
+                    cell = new Cell("e");
                 }
                 cell.setPosition({ row: r, col: c });
                 this.data[r][c] = cell;
@@ -40,10 +43,10 @@ var Maze = /** @class */ (function () {
         if (_width >= _height) {
             // bisection vertically
             if (_width > this._innerBisection) {
-                var _a = this.calcBisectionMinMax(x1, x2, y2, y1, 'vert'), min = _a.min, max = _a.max, bisection = _a.bisection, rand = _a.rand;
+                var _a = this.calcBisectionMinMax(x1, x2, y2, y1, "vert"), min = _a.min, max = _a.max, bisection = _a.bisection, rand = _a.rand;
                 for (var i = y1 + 1; i < y2; i++) {
-                    if (this.data[y2][bisection].value === 'e' &&
-                        this.data[y1][bisection].value === 'e') {
+                    if (this.data[y2][bisection].value === "e" &&
+                        this.data[y1][bisection].value === "e") {
                         if (i === max || i === min) {
                             continue;
                         }
@@ -51,7 +54,7 @@ var Maze = /** @class */ (function () {
                     else if (i === rand) {
                         continue;
                     }
-                    this.data[i][bisection].value = 'w';
+                    this.data[i][bisection].value = "w";
                 }
                 this.carveRecursive(x1, bisection, y1, y2);
                 this.carveRecursive(bisection, x2, y1, y2);
@@ -62,8 +65,8 @@ var Maze = /** @class */ (function () {
             if (_height > this._innerBisection) {
                 var _b = this.calcBisectionMinMax(y1, y2, x2, x1), min = _b.min, max = _b.max, bisection = _b.bisection, rand = _b.rand;
                 for (var i = x1 + 1; i < x2; i++) {
-                    if (this.data[bisection][x2].value === 'e' &&
-                        this.data[bisection][x1].value === 'e') {
+                    if (this.data[bisection][x2].value === "e" &&
+                        this.data[bisection][x1].value === "e") {
                         if (i === max || i === min) {
                             continue;
                         }
@@ -71,7 +74,7 @@ var Maze = /** @class */ (function () {
                     else if (i === rand) {
                         continue;
                     }
-                    this.data[bisection][i].value = 'w';
+                    this.data[bisection][i].value = "w";
                 }
                 this.carveRecursive(x1, x2, y1, bisection);
                 this.carveRecursive(x1, x2, bisection, y2);
@@ -98,9 +101,9 @@ var Maze = /** @class */ (function () {
         var cellHeight = this._height / numRows;
         var cellLength = cellWidth > cellHeight ? cellHeight : cellWidth;
         // define start spot
-        this.startPoint().value = 's';
+        this.startPoint().value = "s";
         // define end spot
-        this.endPoint().value = 'f';
+        this.endPoint().value = "f";
         for (var row = 0; row < numRows; row++) {
             for (var col = 0; col < numCols; col++) {
                 var rectX = col * cellLength;
@@ -117,24 +120,24 @@ var Maze = /** @class */ (function () {
         return this.data[this.data.length - 2][this.data.length - 2];
     };
     Maze.prototype.calcBisectionMinMax = function (a, b, c, d, mode) {
-        if (mode === void 0) { mode = 'hor'; }
+        if (mode === void 0) { mode = "hor"; }
         var bisection = Math.ceil((a + b) / 2);
         var max = c - 1;
         var min = d + 1;
         var random = Math.floor(Math.random() * (max - min + 1)) + min;
-        if (mode === 'hor') {
-            if (this.data[bisection][c].value === 'e') {
+        if (mode === "hor") {
+            if (this.data[bisection][c].value === "e") {
                 random = max;
             }
-            if (this.data[bisection][d].value === 'e') {
+            if (this.data[bisection][d].value === "e") {
                 random = min;
             }
         }
         else {
-            if (this.data[c][bisection].value === 'e') {
+            if (this.data[c][bisection].value === "e") {
                 random = max;
             }
-            if (this.data[d][bisection].value === 'e') {
+            if (this.data[d][bisection].value === "e") {
                 random = min;
             }
         }
@@ -147,4 +150,3 @@ var Maze = /** @class */ (function () {
     };
     return Maze;
 }());
-;

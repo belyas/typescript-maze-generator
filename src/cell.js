@@ -13,20 +13,20 @@ var Cell = /** @class */ (function () {
     Cell.prototype.getColor = function () {
         var color;
         switch (this.value) {
-            case 'w':
-                color = '#212121';
+            case "w":
+                color = "#212121";
                 break;
-            case 'e':
-                color = '#fff';
+            case "e":
+                color = "#fff";
                 break;
-            case 's':
-                color = '#22cc5b';
+            case "s":
+                color = "#22cc5b";
                 break;
-            case 'f':
-                color = '#e52727';
+            case "f":
+                color = "#e52727";
                 break;
             default:
-                color = 'gray';
+                color = "gray";
                 break;
         }
         return color;
@@ -42,4 +42,3 @@ var Cell = /** @class */ (function () {
     };
     return Cell;
 }());
-;
