@@ -1,5 +1,10 @@
 "use strict";
 /// <reference path="cell.ts"/>
+// directtions
+var TOP_ARROW = 38;
+var DOWN_ARROW = 40;
+var LEFT_ARROW = 37;
+var RIGHT_ARROW = 39;
 var Maze = /** @class */ (function () {
     function Maze(_a) {
         var _b = _a.width, width = _b === void 0 ? 500 : _b, _c = _a.height, height = _c === void 0 ? 500 : _c, _d = _a.mazeLength, mazeLength = _d === void 0 ? 20 : _d, ctx = _a.ctx;
@@ -21,11 +26,11 @@ var Maze = /** @class */ (function () {
                 if (r === 0 ||
                     r === this._mzLen - 1 ||
                     (c === 0 || c === this._mzLen - 1)) {
-                    cell = new Cell("edge");
+                    cell = new Cell(EDGE_WALL);
                 }
                 else {
                     // add routes
-                    cell = new Cell("e");
+                    cell = new Cell(ROUTE_WALL);
                 }
                 cell.setPosition({ row: r, col: c });
                 this.data[r][c] = cell;
@@ -45,8 +50,8 @@ var Maze = /** @class */ (function () {
             if (_width > this._innerBisection) {
                 var _a = this.calcBisectionMinMax(x1, x2, y2, y1, "vert"), min = _a.min, max = _a.max, bisection = _a.bisection, rand = _a.rand;
                 for (var i = y1 + 1; i < y2; i++) {
-                    if (this.data[y2][bisection].value === "e" &&
-                        this.data[y1][bisection].value === "e") {
+                    if (this.data[y2][bisection].value === ROUTE_WALL &&
+                        this.data[y1][bisection].value === ROUTE_WALL) {
                         if (i === max || i === min) {
                             continue;
                         }
@@ -54,7 +59,7 @@ var Maze = /** @class */ (function () {
                     else if (i === rand) {
                         continue;
                     }
-                    this.data[i][bisection].value = "w";
+                    this.data[i][bisection].value = BLACK_WALL;
                 }
                 this.carveRecursive(x1, bisection, y1, y2);
                 this.carveRecursive(bisection, x2, y1, y2);
@@ -65,8 +70,8 @@ var Maze = /** @class */ (function () {
             if (_height > this._innerBisection) {
                 var _b = this.calcBisectionMinMax(y1, y2, x2, x1), min = _b.min, max = _b.max, bisection = _b.bisection, rand = _b.rand;
                 for (var i = x1 + 1; i < x2; i++) {
-                    if (this.data[bisection][x2].value === "e" &&
-                        this.data[bisection][x1].value === "e") {
+                    if (this.data[bisection][x2].value === ROUTE_WALL &&
+                        this.data[bisection][x1].value === ROUTE_WALL) {
                         if (i === max || i === min) {
                             continue;
                         }
@@ -74,7 +79,7 @@ var Maze = /** @class */ (function () {
                     else if (i === rand) {
                         continue;
                     }
-                    this.data[bisection][i].value = "w";
+                    this.data[bisection][i].value = BLACK_WALL;
                 }
                 this.carveRecursive(x1, x2, y1, bisection);
                 this.carveRecursive(x1, x2, bisection, y2);
@@ -97,18 +102,36 @@ var Maze = /** @class */ (function () {
             return; // No data has been generated
         }
         var numCols = this.data[0].length;
-        var cellWidth = this._width / numCols;
-        var cellHeight = this._height / numRows;
+        var cellWidth = Math.floor(this._width / numCols);
+        var cellHeight = Math.floor(this._height / numRows);
         var cellLength = cellWidth > cellHeight ? cellHeight : cellWidth;
         // define start spot
-        this.startPoint().value = "s";
+        var starter = this.startPoint();
+        starter.value = STARTER_WALL;
+        starter.row = cellLength;
+        starter.col = cellLength;
         // define end spot
-        this.endPoint().value = "f";
+        this.endPoint().value = END_WALL;
+        this.draw(numRows, numCols, cellLength, starter);
+        this.move(this._width, this._height, numRows, numCols, cellLength);
+    };
+    Maze.prototype.draw = function (numRows, numCols, cellLength, starterPosition) {
         for (var row = 0; row < numRows; row++) {
             for (var col = 0; col < numCols; col++) {
                 var rectX = col * cellLength;
                 var rectY = row * cellLength;
-                this._ctx.fillStyle = this.data[row][col].getColor();
+                var currentCell = this.data[row][col];
+                if (currentCell.value === STARTER_WALL) {
+                    currentCell = starterPosition;
+                    rectY = currentCell.row;
+                    rectX = currentCell.col;
+                }
+                if (currentCell.value === ROUTE_WALL) {
+                    this._ctx.fillStyle = "transparent";
+                }
+                else {
+                    this._ctx.fillStyle = currentCell.getColor();
+                }
                 this._ctx.fillRect(rectX, rectY, cellLength, cellLength);
             }
         }
@@ -126,18 +149,18 @@ var Maze = /** @class */ (function () {
         var min = d + 1;
         var random = Math.floor(Math.random() * (max - min + 1)) + min;
         if (mode === "hor") {
-            if (this.data[bisection][c].value === "e") {
+            if (this.data[bisection][c].value === ROUTE_WALL) {
                 random = max;
             }
-            if (this.data[bisection][d].value === "e") {
+            if (this.data[bisection][d].value === ROUTE_WALL) {
                 random = min;
             }
         }
         else {
-            if (this.data[c][bisection].value === "e") {
+            if (this.data[c][bisection].value === ROUTE_WALL) {
                 random = max;
             }
-            if (this.data[d][bisection].value === "e") {
+            if (this.data[d][bisection].value === ROUTE_WALL) {
                 random = min;
             }
         }
@@ -147,6 +170,51 @@ var Maze = /** @class */ (function () {
             bisection: bisection,
             rand: random
         };
+    };
+    Maze.prototype.move = function (width, height, numRows, numCols, cellLength) {
+        var starter = this.startPoint();
+        var _self = this;
+        document.addEventListener("keyup", function (e) {
+            switch (e.keyCode) {
+                case TOP_ARROW:
+                    var topCell = _self.data[starter.y - 1][starter.x];
+                    if (topCell.value !== EDGE_WALL && topCell.value !== BLACK_WALL) {
+                        starter.row -= cellLength;
+                        starter.y -= 1;
+                        _self._ctx.clearRect(0, 0, width, height);
+                        _self.draw(numRows, numCols, cellLength, starter);
+                    }
+                    break;
+                case DOWN_ARROW:
+                    var bottomCell = _self.data[starter.y + 1][starter.x];
+                    if (bottomCell.value !== EDGE_WALL &&
+                        bottomCell.value !== BLACK_WALL) {
+                        starter.row += cellLength;
+                        starter.y += 1;
+                        _self._ctx.clearRect(0, 0, width, height);
+                        _self.draw(numRows, numCols, cellLength, starter);
+                    }
+                    break;
+                case LEFT_ARROW:
+                    var leftCell = _self.data[starter.y][starter.x - 1];
+                    if (leftCell.value !== EDGE_WALL && leftCell.value !== BLACK_WALL) {
+                        starter.col -= cellLength;
+                        starter.x -= 1;
+                        _self._ctx.clearRect(0, 0, width, height);
+                        _self.draw(numRows, numCols, cellLength, starter);
+                    }
+                    break;
+                case RIGHT_ARROW:
+                    var rightCell = _self.data[starter.y][starter.x + 1];
+                    if (rightCell.value !== EDGE_WALL && rightCell.value !== BLACK_WALL) {
+                        starter.col += cellLength;
+                        starter.x += 1;
+                        _self._ctx.clearRect(0, 0, width, height);
+                        _self.draw(numRows, numCols, cellLength, starter);
+                    }
+                    break;
+            }
+        });
     };
     return Maze;
 }());

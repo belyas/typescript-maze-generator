@@ -7,9 +7,15 @@ interface MazeInterface {
   ctx: any;
 }
 
+// directtions
+const TOP_ARROW = 38;
+const DOWN_ARROW = 40;
+const LEFT_ARROW = 37;
+const RIGHT_ARROW = 39;
+
 class Maze {
   /** @var any holds maze's positions */
-  data: any[];
+  data: Cell[][];
   /** @var number maze's width */
   _width: number;
   /** @var number maze's height */
@@ -19,7 +25,7 @@ class Maze {
   /** @var number min division */
   _innerBisection: number;
   /** @var any|object Canvas context */
-  _ctx: any;
+  _ctx: CanvasRenderingContext2D;
 
   constructor({
     width = 500,
@@ -42,17 +48,18 @@ class Maze {
 
       for (let c = 0; c < this._mzLen; c++) {
         // cols
-        let cell;
+        let cell: Cell;
+
         // add wall edges (top|left|bottom|right)
         if (
           r === 0 ||
           r === this._mzLen - 1 ||
           (c === 0 || c === this._mzLen - 1)
         ) {
-          cell = new Cell("edge");
+          cell = new Cell(EDGE_WALL);
         } else {
           // add routes
-          cell = new Cell("e");
+          cell = new Cell(ROUTE_WALL);
         }
 
         cell.setPosition({ row: r, col: c });
@@ -83,8 +90,8 @@ class Maze {
 
         for (let i = y1 + 1; i < y2; i++) {
           if (
-            this.data[y2][bisection].value === "e" &&
-            this.data[y1][bisection].value === "e"
+            this.data[y2][bisection].value === ROUTE_WALL &&
+            this.data[y1][bisection].value === ROUTE_WALL
           ) {
             if (i === max || i === min) {
               continue;
@@ -93,7 +100,7 @@ class Maze {
             continue;
           }
 
-          this.data[i][bisection].value = "w";
+          this.data[i][bisection].value = BLACK_WALL;
         }
 
         this.carveRecursive(x1, bisection, y1, y2);
@@ -111,8 +118,8 @@ class Maze {
 
         for (let i = x1 + 1; i < x2; i++) {
           if (
-            this.data[bisection][x2].value === "e" &&
-            this.data[bisection][x1].value === "e"
+            this.data[bisection][x2].value === ROUTE_WALL &&
+            this.data[bisection][x1].value === ROUTE_WALL
           ) {
             if (i === max || i === min) {
               continue;
@@ -121,7 +128,7 @@ class Maze {
             continue;
           }
 
-          this.data[bisection][i].value = "w";
+          this.data[bisection][i].value = BLACK_WALL;
         }
 
         this.carveRecursive(x1, x2, y1, bisection);
@@ -144,29 +151,55 @@ class Maze {
 
     this._ctx.clearRect(0, 0, this._width, this._height);
 
-    let numRows = this.data.length;
+    const numRows = this.data.length;
 
     if (!numRows) {
       return; // No data has been generated
     }
 
     let numCols = this.data[0].length;
-    let cellWidth = this._width / numCols;
-    let cellHeight = this._height / numRows;
+    let cellWidth = Math.floor(this._width / numCols);
+    let cellHeight = Math.floor(this._height / numRows);
     let cellLength = cellWidth > cellHeight ? cellHeight : cellWidth;
 
     // define start spot
-    this.startPoint().value = "s";
+    const starter = this.startPoint();
+    starter.value = STARTER_WALL;
+    starter.row = cellLength;
+    starter.col = cellLength;
 
     // define end spot
-    this.endPoint().value = "f";
+    this.endPoint().value = END_WALL;
 
+    this.draw(numRows, numCols, cellLength, starter);
+
+    this.move(this._width, this._height, numRows, numCols, cellLength);
+  }
+
+  draw(
+    numRows: number,
+    numCols: number,
+    cellLength: number,
+    starterPosition: Cell
+  ) {
     for (let row = 0; row < numRows; row++) {
       for (let col = 0; col < numCols; col++) {
         let rectX = col * cellLength;
         let rectY = row * cellLength;
+        let currentCell = this.data[row][col];
 
-        this._ctx.fillStyle = this.data[row][col].getColor();
+        if (currentCell.value === STARTER_WALL) {
+          currentCell = starterPosition;
+          rectY = currentCell.row;
+          rectX = currentCell.col;
+        }
+
+        if (currentCell.value === ROUTE_WALL) {
+          this._ctx.fillStyle = "transparent";
+        } else {
+          this._ctx.fillStyle = currentCell.getColor();
+        }
+
         this._ctx.fillRect(rectX, rectY, cellLength, cellLength);
       }
     }
@@ -193,19 +226,19 @@ class Maze {
     let random = Math.floor(Math.random() * (max - min + 1)) + min;
 
     if (mode === "hor") {
-      if (this.data[bisection][c].value === "e") {
+      if (this.data[bisection][c].value === ROUTE_WALL) {
         random = max;
       }
 
-      if (this.data[bisection][d].value === "e") {
+      if (this.data[bisection][d].value === ROUTE_WALL) {
         random = min;
       }
     } else {
-      if (this.data[c][bisection].value === "e") {
+      if (this.data[c][bisection].value === ROUTE_WALL) {
         random = max;
       }
 
-      if (this.data[d][bisection].value === "e") {
+      if (this.data[d][bisection].value === ROUTE_WALL) {
         random = min;
       }
     }
@@ -216,5 +249,68 @@ class Maze {
       bisection,
       rand: random
     };
+  }
+
+  move(
+    width: number,
+    height: number,
+    numRows: number,
+    numCols: number,
+    cellLength: number
+  ) {
+    const starter = this.startPoint();
+    const _self = this;
+
+    document.addEventListener("keyup", function(e) {
+      switch (e.keyCode) {
+        case TOP_ARROW:
+          const topCell = _self.data[starter.y - 1][starter.x];
+
+          if (topCell.value !== EDGE_WALL && topCell.value !== BLACK_WALL) {
+            starter.row -= cellLength;
+            starter.y -= 1;
+
+            _self._ctx.clearRect(0, 0, width, height);
+            _self.draw(numRows, numCols, cellLength, starter);
+          }
+          break;
+        case DOWN_ARROW:
+          const bottomCell = _self.data[starter.y + 1][starter.x];
+
+          if (
+            bottomCell.value !== EDGE_WALL &&
+            bottomCell.value !== BLACK_WALL
+          ) {
+            starter.row += cellLength;
+            starter.y += 1;
+
+            _self._ctx.clearRect(0, 0, width, height);
+            _self.draw(numRows, numCols, cellLength, starter);
+          }
+          break;
+        case LEFT_ARROW:
+          const leftCell = _self.data[starter.y][starter.x - 1];
+
+          if (leftCell.value !== EDGE_WALL && leftCell.value !== BLACK_WALL) {
+            starter.col -= cellLength;
+            starter.x -= 1;
+
+            _self._ctx.clearRect(0, 0, width, height);
+            _self.draw(numRows, numCols, cellLength, starter);
+          }
+          break;
+        case RIGHT_ARROW:
+          const rightCell = _self.data[starter.y][starter.x + 1];
+
+          if (rightCell.value !== EDGE_WALL && rightCell.value !== BLACK_WALL) {
+            starter.col += cellLength;
+            starter.x += 1;
+
+            _self._ctx.clearRect(0, 0, width, height);
+            _self.draw(numRows, numCols, cellLength, starter);
+          }
+          break;
+      }
+    });
   }
 }
