@@ -1,20 +1,31 @@
 interface CellPosition {
-  row: number;
-  col: number;
+  readonly row: number;
+  readonly col: number;
 }
+
+// spots
+const STARTER_WALL = "s";
+const END_WALL = "f";
+const ROUTE_WALL = "e";
+const BLACK_WALL = "w";
+const EDGE_WALL = "edge";
 
 class Cell {
   /** @var string holds cell's value to be colored */
   value: string;
-  /** @var number|null cell's row position */
-  row: number | null;
-  /** @var number|null cell's column position */
-  col: number | null;
+  /** @var number cell's row position */
+  row: number;
+  /** @var number cell's column position */
+  col: number;
+  x: number;
+  y: number;
 
   constructor(type: string) {
     this.value = type;
-    this.row = null;
-    this.col = null;
+    this.row = 0;
+    this.col = 0;
+    this.x = 0;
+    this.y = 0;
   }
 
   /**
@@ -54,5 +65,7 @@ class Cell {
   setPosition(position: CellPosition): void {
     this.row = position.row;
     this.col = position.col;
+    this.x = position.col;
+    this.y = position.row;
   }
 }

@@ -1,9 +1,17 @@
 "use strict";
+// spots
+var STARTER_WALL = "s";
+var END_WALL = "f";
+var ROUTE_WALL = "e";
+var BLACK_WALL = "w";
+var EDGE_WALL = "edge";
 var Cell = /** @class */ (function () {
     function Cell(type) {
         this.value = type;
-        this.row = null;
-        this.col = null;
+        this.row = 0;
+        this.col = 0;
+        this.x = 0;
+        this.y = 0;
     }
     /**
      * Get cell specific color
@@ -39,6 +47,8 @@ var Cell = /** @class */ (function () {
     Cell.prototype.setPosition = function (position) {
         this.row = position.row;
         this.col = position.col;
+        this.x = position.col;
+        this.y = position.row;
     };
     return Cell;
 }());
