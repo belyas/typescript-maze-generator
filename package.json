@@ -4,7 +4,8 @@
   "description": "Javascript maze generator",
   "main": "src/app.js",
   "scripts": {
-    "tsc": "tsc"
+    "tsc": "tsc",
+    "tsc-watch": "tsc --watch"
   },
   "repository": {
     "type": "git",
