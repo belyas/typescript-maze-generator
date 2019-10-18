@@ -183,6 +183,7 @@ var Maze = /** @class */ (function () {
                         starter.y -= 1;
                         _self._ctx.clearRect(0, 0, width, height);
                         _self.draw(numRows, numCols, cellLength, starter);
+                        _self.isStarterArrived(starter);
                     }
                     break;
                 case DOWN_ARROW:
@@ -193,6 +194,7 @@ var Maze = /** @class */ (function () {
                         starter.y += 1;
                         _self._ctx.clearRect(0, 0, width, height);
                         _self.draw(numRows, numCols, cellLength, starter);
+                        _self.isStarterArrived(starter);
                     }
                     break;
                 case LEFT_ARROW:
@@ -202,6 +204,7 @@ var Maze = /** @class */ (function () {
                         starter.x -= 1;
                         _self._ctx.clearRect(0, 0, width, height);
                         _self.draw(numRows, numCols, cellLength, starter);
+                        _self.isStarterArrived(starter);
                     }
                     break;
                 case RIGHT_ARROW:
@@ -211,10 +214,19 @@ var Maze = /** @class */ (function () {
                         starter.x += 1;
                         _self._ctx.clearRect(0, 0, width, height);
                         _self.draw(numRows, numCols, cellLength, starter);
+                        _self.isStarterArrived(starter);
                     }
                     break;
             }
         });
+    };
+    Maze.prototype.isStarterArrived = function (starter) {
+        var endPoint = this.endPoint();
+        var hasArrived = starter.x === endPoint.x && starter.y === endPoint.y;
+        if (hasArrived) {
+            alert("Congrats, you did it :)");
+        }
+        return hasArrived;
     };
     return Maze;
 }());

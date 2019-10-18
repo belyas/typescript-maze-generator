@@ -257,7 +257,7 @@ class Maze {
     numRows: number,
     numCols: number,
     cellLength: number
-  ) {
+  ): void {
     const starter = this.startPoint();
     const _self = this;
 
@@ -272,6 +272,8 @@ class Maze {
 
             _self._ctx.clearRect(0, 0, width, height);
             _self.draw(numRows, numCols, cellLength, starter);
+
+            _self.isStarterArrived(starter);
           }
           break;
         case DOWN_ARROW:
@@ -286,6 +288,8 @@ class Maze {
 
             _self._ctx.clearRect(0, 0, width, height);
             _self.draw(numRows, numCols, cellLength, starter);
+
+            _self.isStarterArrived(starter);
           }
           break;
         case LEFT_ARROW:
@@ -297,6 +301,8 @@ class Maze {
 
             _self._ctx.clearRect(0, 0, width, height);
             _self.draw(numRows, numCols, cellLength, starter);
+
+            _self.isStarterArrived(starter);
           }
           break;
         case RIGHT_ARROW:
@@ -308,9 +314,22 @@ class Maze {
 
             _self._ctx.clearRect(0, 0, width, height);
             _self.draw(numRows, numCols, cellLength, starter);
+
+            _self.isStarterArrived(starter);
           }
           break;
       }
     });
+  }
+
+  isStarterArrived(starter: Cell): boolean {
+    const endPoint: Cell = this.endPoint();
+    const hasArrived = starter.x === endPoint.x && starter.y === endPoint.y;
+
+    if (hasArrived) {
+      alert("Congrats, you did it :)");
+    }
+
+    return hasArrived;
   }
 }

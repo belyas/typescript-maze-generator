@@ -12,6 +12,7 @@ var Cell = /** @class */ (function () {
         this.col = 0;
         this.x = 0;
         this.y = 0;
+        this.visited = false;
     }
     /**
      * Get cell specific color
@@ -21,16 +22,16 @@ var Cell = /** @class */ (function () {
     Cell.prototype.getColor = function () {
         var color;
         switch (this.value) {
-            case "w":
+            case BLACK_WALL:
                 color = "#212121";
                 break;
-            case "e":
+            case ROUTE_WALL:
                 color = "#fff";
                 break;
-            case "s":
+            case STARTER_WALL:
                 color = "#22cc5b";
                 break;
-            case "f":
+            case END_WALL:
                 color = "#e52727";
                 break;
             default:

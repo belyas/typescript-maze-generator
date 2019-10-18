@@ -19,6 +19,7 @@ class Cell {
   col: number;
   x: number;
   y: number;
+  visited: boolean;
 
   constructor(type: string) {
     this.value = type;
@@ -26,6 +27,7 @@ class Cell {
     this.col = 0;
     this.x = 0;
     this.y = 0;
+    this.visited = false;
   }
 
   /**
@@ -37,16 +39,16 @@ class Cell {
     let color: string;
 
     switch (this.value) {
-      case "w":
+      case BLACK_WALL:
         color = "#212121";
         break;
-      case "e":
+      case ROUTE_WALL:
         color = "#fff";
         break;
-      case "s":
+      case STARTER_WALL:
         color = "#22cc5b";
         break;
-      case "f":
+      case END_WALL:
         color = "#e52727";
         break;
       default:
