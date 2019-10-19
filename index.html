@@ -1,24 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>Javascript Maze Generator</title>
     <style>
-        #regenerateMaze {
-            background-color: #4d4c4c;border: none;padding: 10px;color: #fff;font-size: 14px;cursor: pointer;
-        }
+      .maze {
+        display: flex;
+        align-items: center;
+        justify-content: space-around;
+        width: 700px;
+        margin-bottom: 20px;
+      }
+      button {
+        background-color: #4d4c4c;
+        border: none;
+        padding: 10px;
+        color: #fff;
+        font-size: 14px;
+        cursor: pointer;
+        width: 48%;
+      }
     </style>
-</head>
-<body>
-    <div style="margin-bottom: 20px;">
-        <button id="regenerateMaze">Regenerate Maze Pattern</button>
+  </head>
+  <body>
+    <div class="maze">
+      <button id="maze">Regenerate Maze Pattern</button>
+      <button id="path-solver">Solve Path</button>
     </div>
     <canvas id="pp-maze"></canvas>
 
     <script src="src/cell.js"></script>
     <script src="src/maze.js"></script>
     <script src="src/app.js"></script>
-</body>
+  </body>
 </html>
