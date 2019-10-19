@@ -9,6 +9,7 @@ const END_WALL = "f";
 const ROUTE_WALL = "e";
 const BLACK_WALL = "w";
 const EDGE_WALL = "edge";
+const PATH_WALL = "p";
 
 class Cell {
   /** @var string holds cell's value to be colored */
@@ -19,7 +20,8 @@ class Cell {
   col: number;
   x: number;
   y: number;
-  visited: boolean;
+  bgColor: string;
+  prev: Cell | null;
 
   constructor(type: string) {
     this.value = type;
@@ -27,7 +29,8 @@ class Cell {
     this.col = 0;
     this.x = 0;
     this.y = 0;
-    this.visited = false;
+    this.prev = null;
+    this.bgColor = "trans";
   }
 
   /**
@@ -51,6 +54,9 @@ class Cell {
       case END_WALL:
         color = "#e52727";
         break;
+      case PATH_WALL:
+        color = "orange";
+        break;
       default:
         color = "gray";
         break;
@@ -69,5 +75,14 @@ class Cell {
     this.col = position.col;
     this.x = position.col;
     this.y = position.row;
+  }
+
+  getNeighbors(): number[][] {
+    return [
+      [this.y - 1, this.x],
+      [this.y, this.x - 1],
+      [this.y, this.x + 1],
+      [this.y + 1, this.x]
+    ];
   }
 }

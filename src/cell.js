@@ -5,6 +5,7 @@ var END_WALL = "f";
 var ROUTE_WALL = "e";
 var BLACK_WALL = "w";
 var EDGE_WALL = "edge";
+var PATH_WALL = "p";
 var Cell = /** @class */ (function () {
     function Cell(type) {
         this.value = type;
@@ -12,7 +13,8 @@ var Cell = /** @class */ (function () {
         this.col = 0;
         this.x = 0;
         this.y = 0;
-        this.visited = false;
+        this.prev = null;
+        this.bgColor = "trans";
     }
     /**
      * Get cell specific color
@@ -34,6 +36,9 @@ var Cell = /** @class */ (function () {
             case END_WALL:
                 color = "#e52727";
                 break;
+            case PATH_WALL:
+                color = "orange";
+                break;
             default:
                 color = "gray";
                 break;
@@ -50,6 +55,14 @@ var Cell = /** @class */ (function () {
         this.col = position.col;
         this.x = position.col;
         this.y = position.row;
+    };
+    Cell.prototype.getNeighbors = function () {
+        return [
+            [this.y - 1, this.x],
+            [this.y, this.x - 1],
+            [this.y, this.x + 1],
+            [this.y + 1, this.x]
+        ];
     };
     return Cell;
 }());
