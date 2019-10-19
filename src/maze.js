@@ -14,6 +14,9 @@ var Maze = /** @class */ (function () {
         this._mzLen = mazeLength;
         this._innerBisection = 3;
         this._ctx = ctx;
+        this._cellLength = 0;
+        this.start = null;
+        this.end = null;
     }
     Maze.prototype.prepareData = function () {
         for (var r = 0; r < this._mzLen; r++) {
@@ -105,42 +108,70 @@ var Maze = /** @class */ (function () {
         var cellWidth = Math.floor(this._width / numCols);
         var cellHeight = Math.floor(this._height / numRows);
         var cellLength = cellWidth > cellHeight ? cellHeight : cellWidth;
+        this._cellLength = cellLength;
+        this.startPoint();
+        this.endPoint();
         // define start spot
-        var starter = this.startPoint();
-        starter.value = STARTER_WALL;
-        starter.row = cellLength;
-        starter.col = cellLength;
+        if (this.start) {
+            this.start.value = STARTER_WALL;
+            this.start.row = cellLength;
+            this.start.col = cellLength;
+        }
         // define end spot
-        this.endPoint().value = END_WALL;
-        this.draw(numRows, numCols, cellLength, starter);
-        this.move(this._width, this._height, numRows, numCols, cellLength);
+        if (this.end) {
+            this.end.value = END_WALL;
+        }
+        this.draw(numRows, numCols, cellLength);
+        // this.move(numRows, numCols, cellLength);
     };
-    Maze.prototype.draw = function (numRows, numCols, cellLength, starterPosition) {
+    Maze.prototype.pathfinder = function () {
+        var start = this.end;
+        if (!start)
+            return;
+        start.prev = null;
+        var queue = [start];
+        while (queue.length > 0) {
+            var currentCell = queue.shift();
+            if (currentCell) {
+                var neighbors = currentCell.getNeighbors();
+                for (var _i = 0, neighbors_1 = neighbors; _i < neighbors_1.length; _i++) {
+                    var neighbor = neighbors_1[_i];
+                    var row = neighbor[0];
+                    var col = neighbor[1];
+                    if (row >= 1 &&
+                        col >= 1 &&
+                        row < this.data.length - 1 &&
+                        col < this.data[0].length - 1) {
+                        var cell = this.data[row][col];
+                        if (cell.bgColor === "trans" &&
+                            (cell.value === ROUTE_WALL || cell.value === STARTER_WALL)) {
+                            cell.bgColor = "orange";
+                            cell.prev = currentCell;
+                            queue.push(cell);
+                        }
+                    }
+                }
+                currentCell.bgColor = "none";
+            }
+        }
+    };
+    Maze.prototype.draw = function (numRows, numCols, cellLength) {
+        this._ctx.clearRect(0, 0, this._width, this._height);
         for (var row = 0; row < numRows; row++) {
             for (var col = 0; col < numCols; col++) {
                 var rectX = col * cellLength;
                 var rectY = row * cellLength;
                 var currentCell = this.data[row][col];
-                if (currentCell.value === STARTER_WALL) {
-                    currentCell = starterPosition;
-                    rectY = currentCell.row;
-                    rectX = currentCell.col;
-                }
-                if (currentCell.value === ROUTE_WALL) {
-                    this._ctx.fillStyle = "transparent";
-                }
-                else {
-                    this._ctx.fillStyle = currentCell.getColor();
-                }
+                this._ctx.fillStyle = currentCell.getColor();
                 this._ctx.fillRect(rectX, rectY, cellLength, cellLength);
             }
         }
     };
     Maze.prototype.startPoint = function () {
-        return this.data[1][1];
+        this.start = this.data[1][1];
     };
     Maze.prototype.endPoint = function () {
-        return this.data[this.data.length - 2][this.data.length - 2];
+        this.end = this.data[this.data.length - 2][this.data[0].length - 2];
     };
     Maze.prototype.calcBisectionMinMax = function (a, b, c, d, mode) {
         if (mode === void 0) { mode = "hor"; }
@@ -171,19 +202,20 @@ var Maze = /** @class */ (function () {
             rand: random
         };
     };
-    Maze.prototype.move = function (width, height, numRows, numCols, cellLength) {
-        var starter = this.startPoint();
+    Maze.prototype.move = function (numRows, numCols, cellLength) {
+        var starter = this.start;
         var _self = this;
+        if (!starter)
+            return;
         document.addEventListener("keyup", function (e) {
+            var hasMoved = false;
             switch (e.keyCode) {
                 case TOP_ARROW:
                     var topCell = _self.data[starter.y - 1][starter.x];
                     if (topCell.value !== EDGE_WALL && topCell.value !== BLACK_WALL) {
                         starter.row -= cellLength;
                         starter.y -= 1;
-                        _self._ctx.clearRect(0, 0, width, height);
-                        _self.draw(numRows, numCols, cellLength, starter);
-                        _self.isStarterArrived(starter);
+                        hasMoved = true;
                     }
                     break;
                 case DOWN_ARROW:
@@ -192,9 +224,7 @@ var Maze = /** @class */ (function () {
                         bottomCell.value !== BLACK_WALL) {
                         starter.row += cellLength;
                         starter.y += 1;
-                        _self._ctx.clearRect(0, 0, width, height);
-                        _self.draw(numRows, numCols, cellLength, starter);
-                        _self.isStarterArrived(starter);
+                        hasMoved = true;
                     }
                     break;
                 case LEFT_ARROW:
@@ -202,9 +232,7 @@ var Maze = /** @class */ (function () {
                     if (leftCell.value !== EDGE_WALL && leftCell.value !== BLACK_WALL) {
                         starter.col -= cellLength;
                         starter.x -= 1;
-                        _self._ctx.clearRect(0, 0, width, height);
-                        _self.draw(numRows, numCols, cellLength, starter);
-                        _self.isStarterArrived(starter);
+                        hasMoved = true;
                     }
                     break;
                 case RIGHT_ARROW:
@@ -212,21 +240,28 @@ var Maze = /** @class */ (function () {
                     if (rightCell.value !== EDGE_WALL && rightCell.value !== BLACK_WALL) {
                         starter.col += cellLength;
                         starter.x += 1;
-                        _self._ctx.clearRect(0, 0, width, height);
-                        _self.draw(numRows, numCols, cellLength, starter);
-                        _self.isStarterArrived(starter);
+                        hasMoved = true;
                     }
                     break;
+            }
+            if (hasMoved && starter) {
+                // _self.draw(numRows, numCols, cellLength, starter);
+                _self.isStarterArrived(starter);
             }
         });
     };
     Maze.prototype.isStarterArrived = function (starter) {
-        var endPoint = this.endPoint();
-        var hasArrived = starter.x === endPoint.x && starter.y === endPoint.y;
+        var endPoint = this.end;
+        var hasArrived = this.isAtSamePosition(starter, endPoint);
         if (hasArrived) {
-            alert("Congrats, you did it :)");
+            console.log("Congrats, you did it :)");
         }
         return hasArrived;
+    };
+    Maze.prototype.isAtSamePosition = function (starter, currentPos) {
+        if (!currentPos)
+            return false;
+        return starter.x === currentPos.x && starter.y === currentPos.y;
     };
     return Maze;
 }());

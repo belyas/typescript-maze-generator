@@ -26,6 +26,9 @@ class Maze {
   _innerBisection: number;
   /** @var any|object Canvas context */
   _ctx: CanvasRenderingContext2D;
+  _cellLength: number;
+  start: Cell | null;
+  end: Cell | null;
 
   constructor({
     width = 500,
@@ -39,6 +42,9 @@ class Maze {
     this._mzLen = mazeLength;
     this._innerBisection = 3;
     this._ctx = ctx;
+    this._cellLength = 0;
+    this.start = null;
+    this.end = null;
   }
 
   prepareData() {
@@ -161,56 +167,92 @@ class Maze {
     let cellWidth = Math.floor(this._width / numCols);
     let cellHeight = Math.floor(this._height / numRows);
     let cellLength = cellWidth > cellHeight ? cellHeight : cellWidth;
+    this._cellLength = cellLength;
+
+    this.startPoint();
+    this.endPoint();
 
     // define start spot
-    const starter = this.startPoint();
-    starter.value = STARTER_WALL;
-    starter.row = cellLength;
-    starter.col = cellLength;
+    if (this.start) {
+      this.start.value = STARTER_WALL;
+      this.start.row = cellLength;
+      this.start.col = cellLength;
+    }
 
     // define end spot
-    this.endPoint().value = END_WALL;
+    if (this.end) {
+      this.end.value = END_WALL;
+    }
 
-    this.draw(numRows, numCols, cellLength, starter);
+    this.draw(numRows, numCols, cellLength);
 
-    this.move(this._width, this._height, numRows, numCols, cellLength);
+    // this.move(numRows, numCols, cellLength);
   }
 
-  draw(
-    numRows: number,
-    numCols: number,
-    cellLength: number,
-    starterPosition: Cell
-  ) {
+  pathfinder() {
+    let start = this.end;
+
+    if (!start) return;
+
+    start.prev = null;
+    let queue: Cell[] = [start];
+
+    while (queue.length > 0) {
+      let currentCell = queue.shift();
+
+      if (currentCell) {
+        let neighbors = currentCell.getNeighbors();
+
+        for (let neighbor of neighbors) {
+          let row = neighbor[0];
+          let col = neighbor[1];
+
+          if (
+            row >= 1 &&
+            col >= 1 &&
+            row < this.data.length - 1 &&
+            col < this.data[0].length - 1
+          ) {
+            let cell = this.data[row][col];
+
+            if (
+              cell.bgColor === "trans" &&
+              (cell.value === ROUTE_WALL || cell.value === STARTER_WALL)
+            ) {
+              cell.bgColor = "orange";
+              cell.prev = currentCell;
+              queue.push(cell);
+            }
+          }
+        }
+
+        currentCell.bgColor = "none";
+      }
+    }
+  }
+
+  draw(numRows: number, numCols: number, cellLength: number) {
+    this._ctx.clearRect(0, 0, this._width, this._height);
+
     for (let row = 0; row < numRows; row++) {
       for (let col = 0; col < numCols; col++) {
         let rectX = col * cellLength;
         let rectY = row * cellLength;
         let currentCell = this.data[row][col];
 
-        if (currentCell.value === STARTER_WALL) {
-          currentCell = starterPosition;
-          rectY = currentCell.row;
-          rectX = currentCell.col;
-        }
-
-        if (currentCell.value === ROUTE_WALL) {
-          this._ctx.fillStyle = "transparent";
-        } else {
-          this._ctx.fillStyle = currentCell.getColor();
-        }
+        this._ctx.fillStyle = currentCell.getColor();
 
         this._ctx.fillRect(rectX, rectY, cellLength, cellLength);
       }
     }
   }
 
-  startPoint() {
-    return this.data[1][1];
+  startPoint(): void {
+    this.start = this.data[1][1];
   }
 
-  endPoint() {
-    return this.data[this.data.length - 2][this.data.length - 2];
+  endPoint(): void {
+    this.end = this.data[this.data.length - 2][this.data[0].length - 2];
   }
 
   calcBisectionMinMax(
@@ -251,17 +293,14 @@ class Maze {
     };
   }
 
-  move(
-    width: number,
-    height: number,
-    numRows: number,
-    numCols: number,
-    cellLength: number
-  ): void {
-    const starter = this.startPoint();
+  move(numRows: number, numCols: number, cellLength: number): void {
+    const starter = this.start;
     const _self = this;
 
+    if (!starter) return;
+
     document.addEventListener("keyup", function(e) {
+      let hasMoved = false;
       switch (e.keyCode) {
         case TOP_ARROW:
           const topCell = _self.data[starter.y - 1][starter.x];
@@ -269,11 +308,7 @@ class Maze {
           if (topCell.value !== EDGE_WALL && topCell.value !== BLACK_WALL) {
             starter.row -= cellLength;
             starter.y -= 1;
-
-            _self._ctx.clearRect(0, 0, width, height);
-            _self.draw(numRows, numCols, cellLength, starter);
-
-            _self.isStarterArrived(starter);
+            hasMoved = true;
           }
           break;
         case DOWN_ARROW:
@@ -285,11 +320,7 @@ class Maze {
           ) {
             starter.row += cellLength;
             starter.y += 1;
-
-            _self._ctx.clearRect(0, 0, width, height);
-            _self.draw(numRows, numCols, cellLength, starter);
-
-            _self.isStarterArrived(starter);
+            hasMoved = true;
           }
           break;
         case LEFT_ARROW:
@@ -298,11 +329,7 @@ class Maze {
           if (leftCell.value !== EDGE_WALL && leftCell.value !== BLACK_WALL) {
             starter.col -= cellLength;
             starter.x -= 1;
-
-            _self._ctx.clearRect(0, 0, width, height);
-            _self.draw(numRows, numCols, cellLength, starter);
-
-            _self.isStarterArrived(starter);
+            hasMoved = true;
           }
           break;
         case RIGHT_ARROW:
@@ -311,25 +338,32 @@ class Maze {
           if (rightCell.value !== EDGE_WALL && rightCell.value !== BLACK_WALL) {
             starter.col += cellLength;
             starter.x += 1;
-
-            _self._ctx.clearRect(0, 0, width, height);
-            _self.draw(numRows, numCols, cellLength, starter);
-
-            _self.isStarterArrived(starter);
+            hasMoved = true;
           }
           break;
+      }
+
+      if (hasMoved && starter) {
+        // _self.draw(numRows, numCols, cellLength, starter);
+
+        _self.isStarterArrived(starter);
       }
     });
   }
 
   isStarterArrived(starter: Cell): boolean {
-    const endPoint: Cell = this.endPoint();
-    const hasArrived = starter.x === endPoint.x && starter.y === endPoint.y;
+    const endPoint = this.end;
+    const hasArrived = this.isAtSamePosition(starter, endPoint);
 
     if (hasArrived) {
-      alert("Congrats, you did it :)");
+      console.log("Congrats, you did it :)");
     }
 
     return hasArrived;
+  }
+
+  isAtSamePosition(starter: Cell, currentPos: Cell | null): boolean {
+    if (!currentPos) return false;
+    return starter.x === currentPos.x && starter.y === currentPos.y;
   }
 }
