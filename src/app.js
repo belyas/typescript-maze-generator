@@ -1,5 +1,6 @@
 const regenerateMaze = document.getElementById("maze");
-const pathSolver = document.getElementById("path-solver");
+const bfsPathSolver = document.getElementById("bfs-path-solver");
+const dfsPathSolver = document.getElementById("dfs-path-solver");
 const pathClearer = document.getElementById("path-clearer");
 const canvas = document.getElementById("pp-maze");
 const ctx = canvas.getContext("2d");
@@ -22,8 +23,9 @@ const renderMaze = () => {
   PpMaze.render();
 };
 
-const pathSolverFn = () => {
-  PpMaze.pathfinder();
+const pathSolverBfsFn = () => {
+  pathClearerFn();
+  PpMaze.pathfinderBfs();
 
   if (!PpMaze.data.length || !PpMaze.start) return;
 
@@ -60,9 +62,15 @@ const pathClearerFn = () => {
       let rectY = row * PpMaze._cellLength;
       let currentCell = PpMaze.data[row][col];
 
-      if (currentCell.value === PATH_WALL) {
+      if (
+        currentCell.value === PATH_WALL ||
+        currentCell.value === DFS_PATH_WALL
+      ) {
         currentCell.value = ROUTE_WALL;
       }
+
+      currentCell.visited = false;
+      currentCell.bgColor = TRANSPARENT_COLOR_NAME;
 
       PpMaze._ctx.fillStyle = currentCell.getColor();
 
@@ -76,8 +84,48 @@ const pathClearerFn = () => {
   }
 };
 
+const pathSolverDfsFn = () => {
+  pathClearerFn();
+  PpMaze.startPoint();
+
+  if (!PpMaze.data.length || !PpMaze.start) return;
+
+  PpMaze.pathfinderDfs(PpMaze.start);
+
+  let counter = 1;
+  let interVal;
+
+  function drawPath() {
+    if (MAZE_SIZE_LEN === counter) {
+      counter = 1;
+      clearInterval(interVal);
+      return false;
+    }
+
+    for (let index = 1; index < MAZE_SIZE_LEN; index++) {
+      const currentCell = PpMaze.data[index][counter];
+
+      if (currentCell.visited || currentCell.bgColor === BLUE_COLOR_NAME) {
+        currentCell.value = DFS_PATH_WALL;
+      }
+
+      PpMaze.draw(
+        PpMaze.data.length,
+        PpMaze.data[0].length,
+        PpMaze._cellLength
+      );
+    }
+    counter++;
+  }
+
+  interVal = setInterval(() => {
+    drawPath();
+  }, 1000 / 10);
+};
+
 renderMaze();
 
 regenerateMaze.addEventListener("click", renderMaze);
-pathSolver.addEventListener("click", pathSolverFn);
+bfsPathSolver.addEventListener("click", pathSolverBfsFn);
+dfsPathSolver.addEventListener("click", pathSolverDfsFn);
 pathClearer.addEventListener("click", pathClearerFn);
