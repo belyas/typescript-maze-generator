@@ -10,6 +10,20 @@ const ROUTE_WALL = "e";
 const BLACK_WALL = "w";
 const EDGE_WALL = "edge";
 const PATH_WALL = "p";
+const DFS_PATH_WALL = "dp";
+// colors
+const BLACK_COLOR = "#212121";
+const WHITE_COLOR = "#ffffff";
+const GREEN_COLOR = "#22cc5b";
+const RED_COLOR = "#e52727";
+const ORANGE_COLOR = "#FFA500";
+const BLUE_COLOR = "#87CEEB";
+const GRAY_COLOR = "#808080";
+
+const TRANSPARENT_COLOR_NAME = "trans";
+const BLUE_COLOR_NAME = "blue";
+const ORANGE_COLOR_NAME = "orange";
+const NONE_COLOR_NAME = "none";
 
 class Cell {
   /** @var string holds cell's value to be colored */
@@ -22,6 +36,7 @@ class Cell {
   y: number;
   bgColor: string;
   next: Cell | null;
+  visited: boolean;
 
   constructor(type: string) {
     this.value = type;
@@ -31,6 +46,7 @@ class Cell {
     this.y = 0;
     this.next = null;
     this.bgColor = "trans";
+    this.visited = false;
   }
 
   /**
@@ -43,22 +59,25 @@ class Cell {
 
     switch (this.value) {
       case BLACK_WALL:
-        color = "#212121";
+        color = BLACK_COLOR;
         break;
       case ROUTE_WALL:
-        color = "#fff";
+        color = WHITE_COLOR;
         break;
       case STARTER_WALL:
-        color = "#22cc5b";
+        color = GREEN_COLOR;
         break;
       case END_WALL:
-        color = "#e52727";
+        color = RED_COLOR;
         break;
       case PATH_WALL:
-        color = "orange";
+        color = ORANGE_COLOR;
+        break;
+      case DFS_PATH_WALL:
+        color = BLUE_COLOR;
         break;
       default:
-        color = "gray";
+        color = GRAY_COLOR;
         break;
     }
 

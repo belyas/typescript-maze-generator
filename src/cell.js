@@ -6,6 +6,19 @@ var ROUTE_WALL = "e";
 var BLACK_WALL = "w";
 var EDGE_WALL = "edge";
 var PATH_WALL = "p";
+var DFS_PATH_WALL = "dp";
+// colors
+var BLACK_COLOR = "#212121";
+var WHITE_COLOR = "#ffffff";
+var GREEN_COLOR = "#22cc5b";
+var RED_COLOR = "#e52727";
+var ORANGE_COLOR = "#FFA500";
+var BLUE_COLOR = "#87CEEB";
+var GRAY_COLOR = "#808080";
+var TRANSPARENT_COLOR_NAME = "trans";
+var BLUE_COLOR_NAME = "blue";
+var ORANGE_COLOR_NAME = "orange";
+var NONE_COLOR_NAME = "none";
 var Cell = /** @class */ (function () {
     function Cell(type) {
         this.value = type;
@@ -15,6 +28,7 @@ var Cell = /** @class */ (function () {
         this.y = 0;
         this.next = null;
         this.bgColor = "trans";
+        this.visited = false;
     }
     /**
      * Get cell specific color
@@ -25,22 +39,25 @@ var Cell = /** @class */ (function () {
         var color;
         switch (this.value) {
             case BLACK_WALL:
-                color = "#212121";
+                color = BLACK_COLOR;
                 break;
             case ROUTE_WALL:
-                color = "#fff";
+                color = WHITE_COLOR;
                 break;
             case STARTER_WALL:
-                color = "#22cc5b";
+                color = GREEN_COLOR;
                 break;
             case END_WALL:
-                color = "#e52727";
+                color = RED_COLOR;
                 break;
             case PATH_WALL:
-                color = "orange";
+                color = ORANGE_COLOR;
+                break;
+            case DFS_PATH_WALL:
+                color = BLUE_COLOR;
                 break;
             default:
-                color = "gray";
+                color = GRAY_COLOR;
                 break;
         }
         return color;
