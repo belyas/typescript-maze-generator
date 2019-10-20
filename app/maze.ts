@@ -189,7 +189,7 @@ class Maze {
     // this.move(numRows, numCols, cellLength);
   }
 
-  pathfinder() {
+  pathfinderBfs() {
     let start = this.end;
 
     if (!start) return;
@@ -216,17 +216,52 @@ class Maze {
             let cell = this.data[row][col];
 
             if (
-              cell.bgColor === "trans" &&
+              cell.bgColor === TRANSPARENT_COLOR_NAME &&
               (cell.value === ROUTE_WALL || cell.value === STARTER_WALL)
             ) {
-              cell.bgColor = "orange";
+              cell.bgColor = ORANGE_COLOR_NAME;
               cell.next = currentCell;
               queue.push(cell);
             }
           }
         }
 
-        currentCell.bgColor = "none";
+        currentCell.bgColor = NONE_COLOR_NAME;
+      }
+    }
+  }
+
+  pathfinderDfs(root: Cell) {
+    if (this.isStarterArrived(root)) {
+      return;
+    }
+
+    if (!root.visited) {
+      let neighbors = root.getNeighbors();
+      for (let neighbor of neighbors) {
+        let row = neighbor[0];
+        let col = neighbor[1];
+
+        if (
+          row >= 1 &&
+          col >= 1 &&
+          row < this.data.length - 1 &&
+          col < this.data[0].length - 1
+        ) {
+          let cell = this.data[row][col];
+
+          if (
+            cell.bgColor === TRANSPARENT_COLOR_NAME &&
+            cell.value === ROUTE_WALL
+          ) {
+            if (root.value !== STARTER_WALL) {
+              root.visited = true;
+            }
+
+            cell.bgColor = BLUE_COLOR_NAME;
+            this.pathfinderDfs(cell);
+          }
+        }
       }
     }
   }

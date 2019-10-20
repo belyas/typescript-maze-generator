@@ -124,7 +124,7 @@ var Maze = /** @class */ (function () {
         this.draw(numRows, numCols, cellLength);
         // this.move(numRows, numCols, cellLength);
     };
-    Maze.prototype.pathfinder = function () {
+    Maze.prototype.pathfinderBfs = function () {
         var start = this.end;
         if (!start)
             return;
@@ -143,15 +143,42 @@ var Maze = /** @class */ (function () {
                         row < this.data.length - 1 &&
                         col < this.data[0].length - 1) {
                         var cell = this.data[row][col];
-                        if (cell.bgColor === "trans" &&
+                        if (cell.bgColor === TRANSPARENT_COLOR_NAME &&
                             (cell.value === ROUTE_WALL || cell.value === STARTER_WALL)) {
-                            cell.bgColor = "orange";
+                            cell.bgColor = ORANGE_COLOR_NAME;
                             cell.next = currentCell;
                             queue.push(cell);
                         }
                     }
                 }
-                currentCell.bgColor = "none";
+                currentCell.bgColor = NONE_COLOR_NAME;
+            }
+        }
+    };
+    Maze.prototype.pathfinderDfs = function (root) {
+        if (this.isStarterArrived(root)) {
+            return;
+        }
+        if (!root.visited) {
+            var neighbors = root.getNeighbors();
+            for (var _i = 0, neighbors_2 = neighbors; _i < neighbors_2.length; _i++) {
+                var neighbor = neighbors_2[_i];
+                var row = neighbor[0];
+                var col = neighbor[1];
+                if (row >= 1 &&
+                    col >= 1 &&
+                    row < this.data.length - 1 &&
+                    col < this.data[0].length - 1) {
+                    var cell = this.data[row][col];
+                    if (cell.bgColor === TRANSPARENT_COLOR_NAME &&
+                        cell.value === ROUTE_WALL) {
+                        if (root.value !== STARTER_WALL) {
+                            root.visited = true;
+                        }
+                        cell.bgColor = BLUE_COLOR_NAME;
+                        this.pathfinderDfs(cell);
+                    }
+                }
             }
         }
     };
