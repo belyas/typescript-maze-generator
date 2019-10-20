@@ -27,7 +27,7 @@ const pathSolverFn = () => {
 
   if (!PpMaze.data.length || !PpMaze.start) return;
 
-  let currentCell = PpMaze.start.prev;
+  let currentCell = PpMaze.start.next;
 
   function drawPath() {
     if (currentCell && !PpMaze.isAtSamePosition(currentCell, PpMaze.end)) {
@@ -39,11 +39,11 @@ const pathSolverFn = () => {
         PpMaze._cellLength
       );
 
-      if (!currentCell.prev) {
+      if (!currentCell.next) {
         return;
       }
 
-      currentCell = currentCell.prev;
+      currentCell = currentCell.next;
       requestAnimationFrame(drawPath);
     }
   }

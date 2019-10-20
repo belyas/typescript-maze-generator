@@ -128,7 +128,7 @@ var Maze = /** @class */ (function () {
         var start = this.end;
         if (!start)
             return;
-        start.prev = null;
+        start.next = null;
         var queue = [start];
         while (queue.length > 0) {
             var currentCell = queue.shift();
@@ -146,7 +146,7 @@ var Maze = /** @class */ (function () {
                         if (cell.bgColor === "trans" &&
                             (cell.value === ROUTE_WALL || cell.value === STARTER_WALL)) {
                             cell.bgColor = "orange";
-                            cell.prev = currentCell;
+                            cell.next = currentCell;
                             queue.push(cell);
                         }
                     }

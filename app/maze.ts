@@ -194,7 +194,7 @@ class Maze {
 
     if (!start) return;
 
-    start.prev = null;
+    start.next = null;
     let queue: Cell[] = [start];
 
     while (queue.length > 0) {
@@ -220,7 +220,7 @@ class Maze {
               (cell.value === ROUTE_WALL || cell.value === STARTER_WALL)
             ) {
               cell.bgColor = "orange";
-              cell.prev = currentCell;
+              cell.next = currentCell;
               queue.push(cell);
             }
           }
